@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IRB Submission Workflow</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: #f5f6f8;
+  color: #1e2432;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.page {
+  max-width: 680px;
+  margin: 40px auto;
+  padding: 0 20px 60px;
+}
+
+.page-title {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.page-title h1 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #1e2432;
+  margin-bottom: 4px;
+}
+
+.page-title p { color: #6b7280; font-size: 13px; }
+
+/* STEP */
+.step {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  overflow: hidden;
+}
+
+.step-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  background: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.step-num {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: #1e2432;
+  color: white;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.step-title {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #1e2432;
+}
+
+.step-body { padding: 16px 18px; }
+
+/* INSTRUCTION ROW */
+.instr {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.instr:last-child { border-bottom: none; }
+
+.instr-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #d1d5db;
+  flex-shrink: 0;
+  margin-top: 7px;
+}
+
+.instr-text {
+  font-size: 13px;
+  color: #374151;
+  flex: 1;
+  line-height: 1.55;
+}
+
+.instr-text small {
+  display: block;
+  font-size: 11.5px;
+  color: #9ca3af;
+  margin-top: 2px;
+}
+
+/* LINK */
+.link-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #9ca3af;
+  background: #f9fafb;
+  border: 1px dashed #d1d5db;
+  border-radius: 5px;
+  padding: 5px 11px;
+  text-decoration: none;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* NOTE */
+.note {
+  font-size: 12.5px;
+  background: #fefce8;
+  border-left: 3px solid #facc15;
+  padding: 9px 13px;
+  color: #713f12;
+  border-radius: 0 4px 4px 0;
+  margin-bottom: 14px;
+  line-height: 1.55;
+}
+
+.note.red {
+  background: #fef2f2;
+  border-color: #f87171;
+  color: #7f1d1d;
+}
+
+.note.green {
+  background: #f0fdf4;
+  border-color: #4ade80;
+  color: #14532d;
+}
+
+/* STOP */
+.stop-block {
+  display: none;
+  background: #fef2f2;
+  border: 1.5px solid #f87171;
+  border-radius: 8px;
+  padding: 16px;
+  text-align: center;
+  margin-top: 10px;
+}
+
+.stop-block h3 { font-size: 0.95rem; color: #dc2626; margin-bottom: 4px; }
+.stop-block p { font-size: 12.5px; color: #7f1d1d; line-height: 1.55; }
+
+.decision { display: flex; gap: 8px; margin-top: 10px; }
+
+.btn-yes {
+  background: #f0fdf4; border: 1px solid #86efac; color: #15803d;
+  font-size: 12.5px; font-weight: 500; padding: 7px 16px;
+  border-radius: 6px; cursor: pointer;
+}
+
+.btn-no {
+  background: #fef2f2; border: 1px solid #fca5a5; color: #dc2626;
+  font-size: 12.5px; font-weight: 500; padding: 7px 16px;
+  border-radius: 6px; cursor: pointer;
+}
+
+/* METHOD TOGGLE */
+.method-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 0;
+  border-bottom: 1px solid #f3f4f6;
+  cursor: pointer;
+}
+
+.method-toggle:last-of-type { border-bottom: none; }
+.method-toggle input[type=checkbox] { accent-color: #1e2432; width: 14px; height: 14px; cursor: pointer; }
+.method-toggle label { font-size: 13px; color: #374151; font-weight: 500; cursor: pointer; flex: 1; }
+
+.method-detail {
+  display: none;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 12px 14px;
+  margin: 4px 0 10px 22px;
+}
+
+.method-detail .note.green { margin-bottom: 10px; }
+
+/* ZIP */
+.zip-box {
+  background: #1e2432;
+  color: white;
+  border-radius: 8px;
+  padding: 18px 20px;
+  margin-top: 10px;
+}
+
+.zip-name {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1rem;
+  color: #facc15;
+  margin: 6px 0 4px;
+}
+
+.zip-sub { font-size: 11.5px; color: #9ca3af; margin-bottom: 12px; }
+
+.zip-contents {
+  font-size: 12px;
+  color: #9ca3af;
+  line-height: 2;
+  background: #2d3748;
+  border-radius: 6px;
+  padding: 10px 14px;
+  margin-bottom: 14px;
+}
+
+.zip-instr {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.zip-instr span { font-size: 12.5px; color: #9ca3af; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="page-title">
+    <h1>IRB Submission Workflow</h1>
+    <p>Follow each step in order</p>
+  </div>
+
+  <!-- STEP 1 -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">1</div>
+      <div class="step-title">IRB Training</div>
+    </div>
+    <div class="step-body">
+      <div class="instr">
+        <div class="instr-dot"></div>
+        <div class="instr-text">Have you completed IRB training?
+          <small>If not, complete it first using the link below, then return to this workflow.</small>
+        </div>
+        <a class="link-btn" href="https://url.us.m.mimecastprotect.com/s/zeVcCL9G0rIY0xvntBfYHyqECz?domain=hhs.gov" target="_blank">🔗 IRB Training</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">2</div>
+      <div class="step-title">Do you have an Approved Proposal Document?</div>
+    </div>
+    <div class="step-body">
+      <div class="instr">
+        <div class="instr-dot"></div>
+        <div class="instr-text">Book or Dissertation — you need an approved <strong>Research Proposal</strong></div>
+      </div>
+      <div class="instr">
+        <div class="instr-dot"></div>
+        <div class="instr-text">Business Plan — you need an approved <strong>Topic Proposal</strong></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 3 -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">3</div>
+      <div class="step-title">Add Ethical Adherence Protocol to Your Research Proposal or Topic Proposal</div>
+    </div>
+    <div class="step-body">
+      <div class="instr">
+        <div class="instr-dot"></div>
+        <div class="instr-text">Download the Ethical Adherence Protocol template and add it to your approved Research Proposal or Topic Proposal.
+          <small>This section must be embedded in the document — it is not a separate file.</small>
+        </div>
+        <a class="link-btn" href="https://docs.google.com/document/d/1CK8cn-LL7ZAxCkfn9xZMKzhpJrWkaPEg/edit" target="_blank">🔗 Ethical Protocol</a>
+      </div>
+      <div class="instr">
+        <div class="instr-dot"></div>
+        <div class="instr-text">Save the updated document. This is the version you will submit to IRB.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 4 -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">4</div>
+      <div class="step-title">Fill the IRB Application Form</div>
+    </div>
+    <div class="step-body">
+      <div class="note">Nothing may be left blank. Study start date must be at least 3 weeks from the IRB submission date. Data validity must not exceed 12 months from the data collection end date.</div>
+      <div class="instr">
+        <div class="instr-dot"></div>
+        <div class="instr-text">Open the IRB application and fill every field completely.</div>
+        <a class="link-btn" href="https://docs.google.com/document/d/1lqSy8aiR_OxcsdGp377SiigBSQ2-I9gU/edit?usp=sharing" target="_blank">🔗 IRB Application</a>
+      </div>
+      <div class="instr">
+        <div class="instr-dot"></div>
+        <div class="instr-text">Set your <strong>Study Start Date</strong> — must be at least 3 weeks from the date you submit to IRB for approval.</div>
+      </div>
+      <div class="instr">
+        <div class="instr-dot"></div>
+        <div class="instr-text">Set your <strong>Study End Date</strong> and <strong>Data Validity End Date</strong> — data validity must not exceed 12 months from data collection end.</div>
+      </div>
+      <div class="instr">
+        <div class="instr-dot"></div>
+        <div class="instr-text">Take the signature of your chair on the completed application before submitting.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 5 -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">5</div>
+      <div class="step-title">Vulnerable Population Check</div>
+    </div>
+    <div class="step-body">
+      <div class="note red">Does your study involve a vulnerable population — minors, prisoners, cognitively impaired individuals, or others at risk of coercion?<br><br>Does your study involve specific vulnerable population — minors or the cognitively impaired individuals?</div>
+      <div class="decision">
+        <button class="btn-no" onclick="document.getElementById('stop_block').style.display='block'">Yes</button>
+        <button class="btn-yes" onclick="document.getElementById('stop_block').style.display='none'">No — proceed to Step 6</button>
+      </div>
+      <div class="stop-block" id="stop_block">
+        <h3>🛑 Stop — Change Your Research Subject</h3>
+        <p>You must change your study population before proceeding. Revise your Research Proposal or Topic Proposal, obtain new chair approval, and restart from Step 2.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 6 -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">6</div>
+      <div class="step-title">Institutional Consent</div>
+    </div>
+    <div class="step-body">
+      <div class="instr">
+        <div class="instr-dot"></div>
+        <div class="instr-text">If you wish to conduct your study within an institution or organisation, you must obtain institutional consent before beginning data collection.</div>
+      </div>
+      <div class="instr">
+        <div class="instr-dot"></div>
+        <div class="instr-text">Download the institutional consent template, complete it, and get it signed by the relevant authority at the institution.</div>
+        <a class="link-btn" href="https://docs.google.com/document/d/1r2lETFXEmO3R4AF9HxGgONQyvYwIw_n_/edit?usp=sharing" target="_blank">🔗 Institutional Consent</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 7 -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">7</div>
+      <div class="step-title">Plan Your Data Collection Strategy</div>
+    </div>
+    <div class="step-body">
+      <div class="note">Select all methods you will use. Each method requires a consent form and a questions / protocol document.</div>
+
+      <!-- SURVEY -->
+      <div class="method-toggle">
+        <input type="checkbox" id="m_survey" onchange="toggleMethod('survey',this)">
+        <label for="m_survey">Survey / Questionnaire</label>
+      </div>
+      <div class="method-detail" id="sec_survey">
+        <div class="note green">Consent must be <strong>Question 1</strong> in the survey instrument. Also submit it as a standalone consent form.</div>
+        <div class="instr">
+          <div class="instr-dot"></div>
+          <div class="instr-text">Download and complete the survey informed consent form.</div>
+          <a class="link-btn" href="https://docs.google.com/document/d/1CCRqONB3epcb1i-0l4YtTurHuschLIpd/edit?usp=sharing" target="_blank">🔗 Consent Form</a>
+        </div>
+        <div class="instr" style="border-bottom:none">
+          <div class="instr-dot"></div>
+          <div class="instr-text">Prepare your survey questions with consent as Question 1.</div>
+          <a class="link-btn" href="https://ueducation-my.sharepoint.com/:w:/g/personal/sumitra_padmanabhan_upgrad_com/IQCgxX48Qvt1TopqU2Ky7BvwAb7g4XLigaxTbkvOuf_Pltg?e=U2s63A" target="_blank">🔗 Survey Questions</a>
+        </div>
+      </div>
+
+      <!-- INTERVIEW -->
+      <div class="method-toggle">
+        <input type="checkbox" id="m_interview" onchange="toggleMethod('interview',this)">
+        <label for="m_interview">Interview</label>
+      </div>
+      <div class="method-detail" id="sec_interview">
+        <div class="instr">
+          <div class="instr-dot"></div>
+          <div class="instr-text">Download and complete the interview informed consent form.</div>
+          <a class="link-btn" href="https://docs.google.com/document/d/1tUPOemwk9tv3CZ8QSnuElrg4ljBcqX5K/edit?usp=sharing" target="_blank">🔗 Consent Form</a>
+        </div>
+        <div class="instr" style="border-bottom:none">
+          <div class="instr-dot"></div>
+          <div class="instr-text">Prepare your interview questions / protocol.</div>
+          <a class="link-btn" href="https://ueducation-my.sharepoint.com/:w:/g/personal/sumitra_padmanabhan_upgrad_com/IQCgxX48Qvt1TopqU2Ky7BvwAb7g4XLigaxTbkvOuf_Pltg?e=U2s63A" target="_blank">🔗 Interview Questions</a>
+        </div>
+      </div>
+
+      <!-- FOCUS GROUP -->
+      <div class="method-toggle">
+        <input type="checkbox" id="m_fg" onchange="toggleMethod('fg',this)">
+        <label for="m_fg">Focus Group</label>
+      </div>
+      <div class="method-detail" id="sec_fg">
+        <div class="instr">
+          <div class="instr-dot"></div>
+          <div class="instr-text">Download and complete the focus group informed consent form.</div>
+          <a class="link-btn" href="https://docs.google.com/document/d/13XxrmkpGX6PHKxsJPY_1Qi1JL_WENc2H/edit?usp=sharing" target="_blank">🔗 Consent Form</a>
+        </div>
+        <div class="instr" style="border-bottom:none">
+          <div class="instr-dot"></div>
+          <div class="instr-text">Prepare your focus group discussion guide.</div>
+          <a class="link-btn" href="https://ueducation-my.sharepoint.com/:w:/g/personal/sumitra_padmanabhan_upgrad_com/IQCgxX48Qvt1TopqU2Ky7BvwAb7g4XLigaxTbkvOuf_Pltg?e=U2s63A" target="_blank">🔗 Discussion Guide</a>
+        </div>
+      </div>
+
+      <!-- LIVE STUDY -->
+      <div class="method-toggle">
+        <input type="checkbox" id="m_live" onchange="toggleMethod('live',this)">
+        <label for="m_live">Live Study / Observation / Lab</label>
+      </div>
+      <div class="method-detail" id="sec_live">
+        <div class="instr">
+          <div class="instr-dot"></div>
+          <div class="instr-text">Download and complete the live study informed consent form.</div>
+          <a class="link-btn" href="https://docs.google.com/document/d/1koSoPtNfg0SMtidMeVcnWTJrNqGuLnTI/edit?usp=sharing" target="_blank">🔗 Consent Form</a>
+        </div>
+        <div class="instr" style="border-bottom:none">
+          <div class="instr-dot"></div>
+          <div class="instr-text">Prepare your observation / study protocol.</div>
+          <a class="link-btn" href="https://ueducation-my.sharepoint.com/:w:/g/personal/sumitra_padmanabhan_upgrad_com/IQCgxX48Qvt1TopqU2Ky7BvwAb7g4XLigaxTbkvOuf_Pltg?e=U2s63A" target="_blank">🔗 Study Protocol</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- STEP 8 -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">8</div>
+      <div class="step-title">Zip All Files & Submit</div>
+    </div>
+    <div class="step-body">
+      <div class="instr">
+        <div class="instr-dot"></div>
+        <div class="instr-text">Collect all your documents and zip them into a single file named exactly as shown below.</div>
+      </div>
+      <div class="zip-box">
+        <div style="font-size:11px; color:#9ca3af; font-family:'JetBrains Mono',monospace; letter-spacing:1px;">ZIP FILE NAME</div>
+        <div class="zip-name">Therese_Martin_IRB_04012025.zip</div>
+        <div class="zip-sub">lastname_firstname_IRB_submissiondate</div>
+        <div class="zip-contents">
+          📄 IRB training certificate<br>
+          📄 Approved Research Proposal or Topic Proposal (with ethics section)<br>
+          📄 Signed IRB application<br>
+          📄 Institutional consent (if applicable)<br>
+          📄 Informed consent form(s)<br>
+          📄 Survey / interview / focus group / protocol questions
+        </div>
+        <div class="zip-instr">
+          <span>Upload the zip on upGrad learn portal in IRB module</span>
+        </div>
+      </div>
+      <div class="note" style="margin-top: 14px;">Do not be alarmed if the IRB asks you to resubmit. This is common.</div>
+      <div class="note red" style="margin-top: 8px;">*Please note you must submit additional IRB documents if your pilot test differs from your dissertation research.</div>
+      <div class="note red" style="margin-top: 8px;">*Please note you must not run the pilot test until the IRB Committee approves the pilot.</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function toggleMethod(name, cb) {
+  document.getElementById('sec_' + name).style.display = cb.checked ? 'block' : 'none';
+}
+</script>
+</body>
+</html>
